@@ -31,7 +31,6 @@ def select_destination(origin_geocode,angle, radius):
 # More info : https://developers.google.com/maps/documentation/distance-matrix/overview
 def get_transit_time(origin , destinations , mode , traffic):
 
-    API_key = os.environ.get('GOOGLE_MAPS_API_KEY')
     url = 'https://maps.googleapis.com/maps/api/distancematrix/json?'
 
     #Add origin to query string
@@ -54,31 +53,43 @@ def get_transit_time(origin , destinations , mode , traffic):
 
     r = requests.get(url).json()
 
-    times = r['rows'][0]['elements']
+    if(r['status'] == 'OK'):
 
-    final = []
+        times = r['rows'][0]['elements']
 
-    for time in times:
-        if(time['status'] == 'ZERO_RESULTS'):
-            final = final + [None]
+        final = []
 
-        elif(traffic == True):
-            final = final + [time['duration_in_traffic']['value']]
+        for time in times:
+            if(time['status'] == 'ZERO_RESULTS'):
+                final = final + [None]
 
-        else:
-            final = final + [time['duration']['value']]
+            elif(traffic == True):
+                final = final + [time['duration_in_traffic']['value']]
 
-    return final
+            else:
+                final = final + [time['duration']['value']]
+
+        return final
+
+    else:
+        raise Exception(r['status'])
+
 
 # Calculator
-def start(origin , n_points , duration , mode , traffic):    
-
+def start(address , n_points , duration , mode , traffic): 
+    
     isochrone = [{'lat' : 0, 'lng' : 0}] * n_points #final return variable that contain the GPS coordinates of the isochrone
     rad = [duration / float(6)] * n_points  # initial r guess based on 10 km/h speed
     phi = [i * (float(360) / n_points) for i in range(n_points)] #angle distribution
     rmin = [0] * n_points
     rmax = [2.0 * duration] * n_points  # rmax based on 120 km/h speed
     margin = 1
+
+
+    # Convert Address to Str
+    origin = convertToGPS(address)
+
+    
 
     #initial circular mapping of points around the origin
     for i in range(n_points):
@@ -114,7 +125,31 @@ def start(origin , n_points , duration , mode , traffic):
 
             j = j + 1
 
-
         i = i + 1
 
-    return isochrone
+
+    return origin , isochrone
+
+def convertToGPS(address):
+
+    url = 'https://maps.googleapis.com/maps/api/geocode/json?'
+
+    url = url + '&address=' + address
+    url = url + '&key=' + 'AIzaSyAB8O7xp4FZ4-2gBF_QXiLSxWgzL3tsnm8'
+
+    r = requests.get(url).json()
+
+    if(r['status'] == 'OK'):
+
+        lat = r['results'][0]['geometry']['location']['lat']
+        lng = r['results'][0]['geometry']['location']['lng']
+        GPSCoordinates = {'lat' : lat , 'lng' : lng}
+        return GPSCoordinates
+
+
+
+    else:
+        raise Exception(r['status'])  
+
+
+    

@@ -4,21 +4,13 @@
 			
 			<v-col>
 				<v-text-field
-					label="Latitude"
-					hint="Origin latitude in decimal degrees"
-					v-model="originCoordinates.lat"
-					:rules="[v => validateGPSLatitude(v)]"
+					label="Origin Address"
+					hint="Origin address of isochrone"
+					v-model="address"
+					placeholder="Rotunda da Boavista, Porto Portugal"
+					
 				/>
-			</v-col>
-			<v-col>
-				<v-text-field
-					label="Longitude"
-					hint="Origin longitude in decimal degrees"
-					v-model="originCoordinates.lng"
-					:rules="[v => validateGPSLongitude(v)]"
-
-				/>
-			</v-col>
+			</v-col>			
 		</v-row>
 		<v-row align="center">
 			
@@ -26,7 +18,7 @@
 				<v-select
 					label="Number of isochrone points"
 					v-model="nPoints"
-					:items="[5 , 10 , 20 , 30]"
+					:items="[5 , 10 , 20 , 25]"
 				/>
 			</v-col>
 			<v-col>
@@ -52,6 +44,7 @@
 					label="Consider live traffic?"
 					v-model="considerTraffic"
 					:items="[{text : 'Yes' , value : true }, {text : 'No' , value : false}]"
+					:disabled="selectedTransportationMethod !== 'driving'"
 				/>
 			</v-col>
 		</v-row>
@@ -62,7 +55,7 @@
 				color="primary" 
 				elevation="0" 
 				@click="draw"
-				:disabled="!validInputs"
+				:disabled="!validInputs || maxIsochrones"
 				:loading="loading"
 			>
 				Compute Isochrone
@@ -76,32 +69,34 @@
 <script>
 export default {
 
-	props : ['loading'],
+	props : ['loading' , 'maxIsochrones'],
 
 	data: function () {
 		return {			
 			originCoordinates: {"lat" : 41.158167, "lng" : -8.629133 },
-			nPoints : 5,
-			duration : 5,
+			nPoints : 10,
+			duration : 10,
 			transportationMethods : [
 				{text : 'Driving (car)' , value : 'driving' }, 
 				{text : 'Walking' , value : 'walking' }
 			],
 			selectedTransportationMethod : 'driving',
-			considerTraffic : false
+			considerTraffic : false,
+			address : ''
 
 		};
 	},
 
-	methods: {
+	methods: {		
+
 		draw: function () {
 
 			let data = {
-				"origin": {lat : Number(this.originCoordinates.lat) , lng: Number(this.originCoordinates.lng)},
+				"address": this.address,
 				"n_angles": Number(this.nPoints),
 				"duration" : Number(this.duration),
 				"mode" : this.selectedTransportationMethod,
-				"traffic" : this.considerTraffic
+				"traffic" : this.selectedTransportationMethod === 'walking' ? false : this.considerTraffic
 			}			
 
 			this.$emit('submit' , data)

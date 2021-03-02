@@ -15,10 +15,12 @@ def compute_isochrone():
 
     try:
         data = request.json
-        result = start(data['origin'], data['n_angles'] , data['duration']  , data['mode'] , data['traffic'])
-        return {'status' : 'success' , 'result' : result}        
-    except:
-        return {'status' : 'error' , 'message' : 'Something went wrong. Try again.'}
+        origin , isochrone = start(data['address'], data['n_angles'] , data['duration']  , data['mode'] , data['traffic'])
+        return {'status' : 'success' , 'result' : isochrone , 'origin' : origin}        
+    except Exception as e:
+        print(e)
+        return {'status' : 'error' , 'message' : str(e)}
+
 
 
 if __name__ == '__main__':
