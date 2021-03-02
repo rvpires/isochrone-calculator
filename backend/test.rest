@@ -1,0 +1,10 @@
+POST http://localhost:5000/compute
+content-type: application/json
+
+{
+    "origin": {"lat" : 41.158167, "lng" : -8.629133 },
+    "n_angles": 15,
+    "duration" : 30,
+    "mode" : "driving",
+    "traffic" : true
+}
