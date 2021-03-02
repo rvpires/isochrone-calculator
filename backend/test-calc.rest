@@ -1,0 +1,10 @@
+POST http://localhost:5000/compute
+content-type: application/json
+
+{
+    "address": "Rua Alfredo Cunha 193 Matosinhos",
+    "n_angles": 25,
+    "duration" : 30,
+    "mode" : "driving",
+    "traffic" : true
+}
