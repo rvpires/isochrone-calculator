@@ -8,6 +8,7 @@
 					hint="Origin address of isochrone"
 					v-model="address"
 					placeholder="Rotunda da Boavista, Porto Portugal"
+					:rules="[v => v.length === 0 ? 'Input an address' : true]"
 					
 				/>
 			</v-col>			
@@ -152,7 +153,7 @@ export default {
 
 		validInputs : function(){
 
-			if(this.validateGPSLatitude(Number(this.originCoordinates.lat)) === true && this.validateGPSLongitude(Number(this.originCoordinates.lng)) === true && this.validateDuration(Number(this.duration)) === true){
+			if(this.address.length > 0 && this.validateDuration(Number(this.duration)) === true){
 				return true
 			}
 

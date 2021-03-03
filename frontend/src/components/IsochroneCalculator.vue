@@ -79,7 +79,7 @@ export default {
 			this.loading = true		
 			
 
-			axios.post('http://localhost:5000/compute' , data)
+			axios.post('https://isochrone-calculator.herokuapp.com/compute' , data)
 			.then(response =>{
 				if(response.data.status === 'success'){
 					let isochrone = response.data.result
